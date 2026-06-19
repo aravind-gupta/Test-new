@@ -1,0 +1,13 @@
+{
+  "baseUrl": "https://parabank.parasoft.com/parabank/register.htm",
+  "customer": {
+    "firstName": "John",
+    "lastName": "Doe",
+    "address": "123 Main Street",
+    "city": "Pune",
+    "state": "Maharashtra",
+    "zipCode": "411001",
+    "phone": "9876543210",
+    "ssn": "123456789"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "baseUrl": "https://parabank.parasoft.com/parabank/index.htm",
+  "validCustomer": {
+    "username": "bsmith",
+    "password": "demo"
+  },
+  "payee": {
+    "payeeName": "Electric Company",
+    "address": "456 Power St",
+    "city": "Pune",
+    "state": "Maharashtra",
+    "zipCode": "411002",
+    "phone": "9123456780",
+    "amount": "50"
+  },
+  "profileUpdate": {
+    "firstName": "Johnny",
+    "lastName": "Doe",
+    "address": "789 Updated St",
+    "city": "Mumbai",
+    "state": "Maharashtra",
+    "zipCode": "400001",
+    "phone": "9988776655"
+  },
+  "loan": {
+    "validAmount": "5000",
+    "downPayment": "1000",
+    "invalidAmount": "-100"
+  }
+}
