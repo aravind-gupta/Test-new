@@ -8,6 +8,7 @@ export class OpenAccountPage {
   readonly fromAccountDropdown: Locator;
   readonly openAccountButton: Locator;
   readonly successMessage: Locator;
+  readonly openAccountResult: Locator;
   readonly newAccountIdLink: Locator;
 
   // Accounts Overview
@@ -20,9 +21,9 @@ export class OpenAccountPage {
     this.accountTypeDropdown = page.locator('#type');
     this.fromAccountDropdown = page.locator('#fromAccountId');
     this.openAccountButton = page.locator('input[value="Open New Account"]');
-    this.successMessage = page.locator('#openAccountResult h1.title');
-    this.newAccountIdLink = page.locator('#newAccountId');
-
+    this.openAccountResult = page.locator('#openAccountResult');
+    this.successMessage = this.openAccountResult.locator('h1.title');
+    this.newAccountIdLink = this.openAccountResult.getByRole('link');
     this.accountsOverviewLink = page.getByRole('link', { name: 'Accounts Overview' });
     this.accountsTable = page.locator('#accountTable');
   }

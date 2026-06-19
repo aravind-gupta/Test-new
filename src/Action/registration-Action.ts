@@ -53,11 +53,17 @@ export class RegistrationAction {
   }
 
   async submitRegistration() {
-    await this.registrationPage.registerButton.click();
+    await Promise.all([
+      this.page.waitForResponse(response => response.url().includes('register.htm') && response.status() === 200).catch(() => {}),
+      this.registrationPage.registerButton.click(),
+    ]);
+    await expect(this.registrationPage.registerSuccessMessage).toBeVisible({ timeout: 40000 });
   }
 
   async registerNewCustomer(customerData: CustomerData) {
-    await this.goToRegisterPage();
+    if (!this.page.url().includes('register.htm')) {
+      await this.goToRegisterPage();
+    }
     await this.fillRegistrationForm(customerData);
     await this.submitRegistration();
   }
@@ -67,7 +73,7 @@ export class RegistrationAction {
   }
 
   async verifyRegistrationSuccess() {
-    const message = await this.getRegistrationSuccessText();
-    expect(message).toContain('Your account was created successfully');
+    await expect(this.registrationPage.registerSuccessMessage).toBeVisible();
+    await expect(this.registrationPage.registerSuccessMessage).toContainText('Your account was created successfully');
   }
 }

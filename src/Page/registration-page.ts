@@ -33,7 +33,7 @@ export class RegistrationPage {
     this.password = page.locator('#customer\\.password');
     this.confirmPassword = page.locator('#repeatedPassword');
     this.registerButton = page.getByRole('button', { name: 'Register' });
-    this.registerSuccessMessage = page.locator('#rightPanel p').first();
+    this.registerSuccessMessage = page.locator('text=Your account was created successfully');
   }
 }
 

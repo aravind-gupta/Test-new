@@ -35,7 +35,6 @@ export class ProfileUpdatePage {
     this.phone = page.locator('#customer\\.phoneNumber');
     this.updateProfileButton = page.locator('input[value="Update Profile"]');
     this.successMessage = page.locator('#updateProfileResult h1.title');
-
     this.requestLoanLink = page.getByRole('link', { name: 'Request Loan' });
     this.loanAmountInput = page.locator('#amount');
     this.downPaymentInput = page.locator('#downPayment');
