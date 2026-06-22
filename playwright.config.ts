@@ -8,7 +8,7 @@ export default defineConfig({
   },
   fullyParallel: false,
   retries: 0,
-  workers: 6,
+  workers: 3,
   reporter: [['list'], ['html', { outputFolder: 'playwright-report' }]],
 
   use: {

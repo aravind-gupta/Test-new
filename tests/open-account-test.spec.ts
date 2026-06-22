@@ -1,7 +1,7 @@
 import { test, expect } from '../src/Fixture/fixture';
 import testData from '../src/Testdata/testdata.json';
 
-test('Create Savings Account and verify in Accounts Overview', async ({ appAction }) => {
+test('TC02-Create Savings Account and verify in Accounts Overview', async ({ appAction }) => {
   
   await appAction.login.registerAndLogin('John', 'Doe');
   await appAction.openAccount.createNewSavingsAccount();
