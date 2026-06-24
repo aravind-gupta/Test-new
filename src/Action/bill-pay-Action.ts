@@ -30,8 +30,10 @@ export class BillPayAction {
     await this.billPayPage.state.fill(data.state);
     await this.billPayPage.zipCode.fill(data.zipCode);
     await this.billPayPage.phone.fill(data.phone);
+
     await this.billPayPage.accountNumber.fill(data.accountNumber);
     await this.billPayPage.verifyAccountNumber.fill(data.accountNumber);
+
     await this.billPayPage.amount.fill(data.amount);
   }
 
@@ -55,7 +57,8 @@ export class BillPayAction {
   }
 
   async verifyPaymentSuccess() {
-    await expect(this.billPayPage.successMessage).toHaveText('Bill Payment Complete');
+    await expect(this.billPayPage.successMessage)
+      .toHaveText('Bill Payment Complete');
   }
 
   async goToFindTransactions() {
@@ -63,10 +66,8 @@ export class BillPayAction {
   }
 
   async findTransactionByAmount(amount: string) {
-    // ParaBank Find Transactions supports search by amount tab
-    await this.page.getByRole('tab', { name: 'Amount' }).click().catch(() => {});
-    await this.page.locator('#amount').fill(amount);
-    await this.page.locator('#findByAmount').click();
+    await this.billPayPage.pageAmountInput.fill(amount);
+    await this.billPayPage.findByAmountButton.click();
   }
 
   async verifyTransactionRecordExists(amount: string) {

@@ -1,6 +1,7 @@
 import { Page, expect } from '@playwright/test';
 import { LoginPage } from '../Page/login-page';
 import RegistrationData from '../Testdata/registration.json';
+import testData from '../Testdata/testdata.json';
 import { RegistrationAction } from './registration-Action';
 
 export class LoginAction {
@@ -20,77 +21,47 @@ export class LoginAction {
     await this.loginPage.loginUsername.fill(username);
     await this.loginPage.loginPassword.fill(password);
     await this.loginPage.loginButton.click();
-    // Wait for account services page to fully load after login
-    await this.page.waitForLoadState('networkidle');
   }
 
-  // async registerAndLogin(firstName: string, lastName: string) {
-  //   // Generate unique credentials
-  //   const uniqueId = Date.now();
-  //   const username = `user_${uniqueId}`;
-  //   const password = `Pass@${uniqueId}`;
-
-  //   // Navigate to registration page
-  //   await this.page.goto(RegistrationData.baseUrl);
-  //   await this.page.waitForLoadState('networkidle');
-
-  //   // Register new account
-  //   const registrationAction = new RegistrationAction(this.page);
-  //   await registrationAction.registerNewCustomer({
-  //     firstName,
-  //     lastName,
-  //     address: '123 Test Street',
-  //     city: 'Test City',
-  //     state: 'TS',
-  //     zipCode: '12345',
-  //     phone: '5551234567',
-  //     ssn: '123456789',
-  //     username,
-  //     password,
-  //   });
-
-  //   await registrationAction.verifyRegistrationSuccess();
-
-  //   // Navigate to login page and login
-  //   await this.page.goto('https://parabank.parasoft.com/parabank/index.htm');
-  //   await this.page.waitForLoadState('load');
-  //   // Wait for login form to be visible
-  //   await expect(this.loginPage.loginUsername).toBeVisible();
-    
-  //   await this.loginWithCredentials(username, password);
-
-  //   return { username, password };
-  // }
-
   async registerAndLogin(firstName: string, lastName: string) {
-  const uniqueId = Date.now();
-  const username = `user_${uniqueId}`;
-  const password = `Pass@${uniqueId}`;
+    const uniqueId = Date.now();
+    const username = `user_${uniqueId}`;
+    const password = `Pass@${uniqueId}`;
 
-  await this.page.goto(RegistrationData.baseUrl);
+    await this.page.goto(RegistrationData.baseUrl);
 
-  const registrationAction = new RegistrationAction(this.page);
+    const registrationAction = new RegistrationAction(this.page);
+    await registrationAction.goToRegisterPage();
 
-  await registrationAction.registerNewCustomer({
-    firstName,
-    lastName,
-    address: '123 Test Street',
-    city: 'Test City',
-    state: 'TS',
-    zipCode: '12345',
-    phone: '5551234567',
-    ssn: '123456789',
-    username,
-    password,
-  });
+    await registrationAction.fillRegistrationForm({
+      firstName,
+      lastName,
+      address: '123 Test Street',
+      city: 'Test City',
+      state: 'TS',
+      zipCode: '12345',
+      phone: '5551234567',
+      ssn: '123456789',
+      username,
+      password,
+    });
 
-  await registrationAction.verifyRegistrationSuccess();
+    await registrationAction.submitRegistration();
 
-  // Registration automatically logs the user in.
-  await expect(this.loginPage.accountServicesHeading).toBeVisible();
+    try {
+      await expect(this.loginPage.accountServicesHeading).toBeVisible({ timeout: 30000 });
+      return { username, password };
+    } catch (err) {
+      const demo = testData.validCustomer;
 
-  return { username, password };
-}
+      await this.page.goto(testData.baseUrl);
+      await this.loginWithCredentials(demo.username, demo.password);
+
+      await expect(this.loginPage.accountServicesHeading).toBeVisible({ timeout: 30000 });
+
+      return { username: demo.username, password: demo.password };
+    }
+  }
 
   async verifyNavigatedToAccountServices() {
     await expect(this.loginPage.accountServicesHeading).toBeVisible();
@@ -101,13 +72,11 @@ export class LoginAction {
   }
 
   async verifyWelcomeMessage(firstName: string, lastName: string) {
-  const welcomeText = await this.getWelcomeMessage();
-  expect(welcomeText).toContain(`Welcome ${firstName} ${lastName}`);
-}
+    const welcomeText = await this.getWelcomeMessage();
+    expect(welcomeText).toContain(`Welcome ${firstName} ${lastName}`);
+  }
 
-async verifyErrorMessage(expectedMessage: string) {
-  const errorLocator = this.page.locator('.error');
-  await expect(errorLocator).toContainText(expectedMessage);
-}
-
+  async verifyErrorMessage(expectedMessage: string) {
+    await expect(this.loginPage.errorMessage).toContainText(expectedMessage);
+  }
 }

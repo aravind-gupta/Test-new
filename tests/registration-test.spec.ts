@@ -10,7 +10,7 @@ test('TC01-New Customer Registration, Logout, Login and Validation', async ({pag
   await appAction.register.registerNewCustomer({...customerData.customer,username,password,});
   await appAction.register.verifyRegistrationSuccess();
   await appAction.login.logout();
-  await page.goto(customerData.baseUrl);
+  // await page.goto(customerData.baseUrl);
   await appAction.login.loginWithCredentials(username, password);
   await appAction.login.verifyNavigatedToAccountServices();
   await appAction.login.verifyWelcomeMessage(customerData.customer.firstName,customerData.customer.lastName);

@@ -2,9 +2,11 @@ import { Page, expect } from '@playwright/test';
 import { TransferFundsPage } from '../Page/transfer-funds-page';
 
 export class TransferFundsAction {
+  readonly page: Page;
   readonly transferFundsPage: TransferFundsPage;
 
   constructor(page: Page) {
+    this.page = page;
     this.transferFundsPage = new TransferFundsPage(page);
   }
 
@@ -29,30 +31,16 @@ export class TransferFundsAction {
   }
 
   async verifySuccess() {
-    await expect(this.transferFundsPage.transferCompleteMessage)
-      .toHaveText('Transfer Complete!');
+    await expect(this.transferFundsPage.transferCompleteMessage).toHaveText('Transfer Complete!');
   }
 
   async verifyDetails(amount: string, from: string, to: string) {
-    await expect(this.transferFundsPage.transferAmountDisplay)
-      .toContainText(amount);
-
-    await expect(this.transferFundsPage.fromAccountDisplay)
-      .toContainText(from);
-
-    await expect(this.transferFundsPage.toAccountDisplay)
-      .toContainText(to);
+    await expect(this.transferFundsPage.transferAmountDisplay).toContainText(amount);
+    await expect(this.transferFundsPage.fromAccountDisplay).toContainText(from);
+    await expect(this.transferFundsPage.toAccountDisplay).toContainText(to);
   }
 
   async verifyError(expected: string) {
-    const errors = await this.transferFundsPage.errorMessage.allTextContents();
-
-    const match = errors.find(e =>
-      e.toLowerCase().includes(expected.toLowerCase())
-    );
-
-    if (!match) {
-      throw new Error(`Error not found: ${expected}. Got: ${errors.join(', ')}`);
-    }
+    await expect(this.transferFundsPage.errorMessage).toContainText(expected);
   }
 }

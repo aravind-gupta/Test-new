@@ -2,7 +2,6 @@ import { Page, Locator } from '@playwright/test';
 
 export class ProfileUpdatePage {
   readonly page: Page;
-
   readonly updateContactInfoLink: Locator;
   readonly firstName: Locator;
   readonly lastName: Locator;
@@ -13,8 +12,6 @@ export class ProfileUpdatePage {
   readonly phone: Locator;
   readonly updateProfileButton: Locator;
   readonly successMessage: Locator;
-
-  // Loan Request
   readonly requestLoanLink: Locator;
   readonly loanAmountInput: Locator;
   readonly downPaymentInput: Locator;
@@ -25,22 +22,23 @@ export class ProfileUpdatePage {
 
   constructor(page: Page) {
     this.page = page;
+
     this.updateContactInfoLink = page.getByRole('link', { name: 'Update Contact Info' });
-    this.firstName = page.locator('#customer\\.firstName');
-    this.lastName = page.locator('#customer\\.lastName');
-    this.address = page.locator('#customer\\.address\\.street');
-    this.city = page.locator('#customer\\.address\\.city');
-    this.state = page.locator('#customer\\.address\\.state');
-    this.zipCode = page.locator('#customer\\.address\\.zipCode');
-    this.phone = page.locator('#customer\\.phoneNumber');
-    this.updateProfileButton = page.locator('input[value="Update Profile"]');
-    this.successMessage = page.locator('#updateProfileResult h1.title');
+    this.firstName = page.locator('//*[@id="customer.firstName"]');
+    this.lastName = page.locator('//*[@id="customer.lastName"]');
+    this.address = page.locator('//*[@id="customer.address.street"]');
+    this.city = page.locator('//*[@id="customer.address.city"]');
+    this.state = page.locator('//*[@id="customer.address.state"]');
+    this.zipCode = page.locator('//*[@id="customer.address.zipCode"]');
+    this.phone = page.locator('//*[@id="customer.phoneNumber"]');
+    this.updateProfileButton = page.getByRole('button', { name: 'Update Profile' });
+    this.successMessage = page.locator('//*[@id="updateProfileResult"]//h1');
     this.requestLoanLink = page.getByRole('link', { name: 'Request Loan' });
-    this.loanAmountInput = page.locator('#amount');
-    this.downPaymentInput = page.locator('#downPayment');
-    this.fromAccountDropdown = page.locator('#fromAccountId');
-    this.applyNowButton = page.locator('input[value="Apply Now"]');
-    this.loanStatusResult = page.locator('#loanStatus');
-    this.loanErrorMessage = page.locator('.error');
+    this.loanAmountInput = page.locator('//*[@id="amount"]');
+    this.downPaymentInput = page.locator('//*[@id="downPayment"]');
+    this.fromAccountDropdown = page.locator('//*[@id="fromAccountId"]');
+    this.applyNowButton = page.getByRole('button', { name: 'Apply Now' });
+    this.loanStatusResult = page.locator('//*[@id="loanStatus"]');
+    this.loanErrorMessage = page.locator('//*[contains(@class,"error")]');
   }
 }

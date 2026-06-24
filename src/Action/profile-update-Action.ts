@@ -10,6 +10,10 @@ export class ProfileUpdateAction {
     this.profileUpdatePage = new ProfileUpdatePage(page);
   }
 
+  // -------------------------
+  // PROFILE UPDATE FLOW
+  // -------------------------
+
   async goToUpdateContactInfo() {
     await this.profileUpdatePage.updateContactInfoLink.click();
   }
@@ -51,55 +55,67 @@ export class ProfileUpdateAction {
   }
 
   async verifyProfileUpdateSuccess() {
-    await expect(this.profileUpdatePage.successMessage).toHaveText('Profile Updated');
+    await expect(this.profileUpdatePage.successMessage)
+      .toHaveText('Profile Updated');
   }
+
+  // -------------------------
+  // LOAN FLOW
+  // -------------------------
 
   async goToRequestLoan() {
     await this.profileUpdatePage.requestLoanLink.click();
   }
 
-  /**
-   * Returns the first available account ID from the "From account #" dropdown.
-   * Useful when the test doesn't have a specific account ID to use and just
-   * needs a valid, existing account that belongs to the logged-in customer.
-   */
   async getFirstAvailableAccountId(): Promise<string> {
-    const firstOption = this.profileUpdatePage.fromAccountDropdown.locator('option').first();
+    const firstOption = this.profileUpdatePage.fromAccountDropdown
+      .locator('option')
+      .first();
+
     const value = await firstOption.getAttribute('value');
     return value ?? '';
   }
 
-  /**
-   * fromAccountId is now optional. If omitted, the dropdown's existing
-   * (already-selected/default) option is used instead of hardcoding an
-   * account number that may not exist for the logged-in customer.
-   */
-  async fillLoanRequestForm(loanAmount: string, downPayment: string, fromAccountId?: string) {
+  async hasFromAccountOption(value: string): Promise<boolean> {
+    const count = await this.profileUpdatePage
+      .fromAccountDropdown
+      .locator(`option[value="${value}"]`)
+      .count();
+
+    return count > 0;
+  }
+
+  async fillLoanRequestForm(
+    loanAmount: string,
+    downPayment: string,
+    fromAccountId?: string
+  ) {
     await this.profileUpdatePage.loanAmountInput.fill(loanAmount);
     await this.profileUpdatePage.downPaymentInput.fill(downPayment);
 
     if (fromAccountId) {
-      const optionExists = await this.profileUpdatePage.fromAccountDropdown
-        .locator(`option[value="${fromAccountId}"]`)
-        .count();
+      const exists = await this.hasFromAccountOption(fromAccountId);
 
-      if (optionExists === 0) {
+      if (!exists) {
         throw new Error(
-          `Account ID "${fromAccountId}" not found in fromAccountDropdown. ` +
-          `Use getFirstAvailableAccountId() to fetch a valid account instead of hardcoding one.`
+          `Account ID "${fromAccountId}" not found in dropdown. ` +
+          `Use getFirstAvailableAccountId() instead of hardcoding.`
         );
       }
 
       await this.profileUpdatePage.fromAccountDropdown.selectOption(fromAccountId);
     }
-    // If no fromAccountId is passed, the dropdown keeps its default selected option.
   }
 
   async submitLoanRequest() {
     await this.profileUpdatePage.applyNowButton.click();
   }
 
-  async requestLoan(loanAmount: string, downPayment: string, fromAccountId?: string) {
+  async requestLoan(
+    loanAmount: string,
+    downPayment: string,
+    fromAccountId?: string
+  ) {
     await this.goToRequestLoan();
     await this.fillLoanRequestForm(loanAmount, downPayment, fromAccountId);
     await this.submitLoanRequest();
@@ -107,14 +123,20 @@ export class ProfileUpdateAction {
 
   async verifyLoanResponseDisplayed() {
     await expect(this.profileUpdatePage.loanStatusResult).toBeVisible();
-    const status = await this.profileUpdatePage.loanStatusResult.textContent();
-    expect(['Approved', 'Denied']).toContain(status?.trim());
+
+    const status = (await this.profileUpdatePage.loanStatusResult.textContent())?.trim();
+    expect(['Approved', 'Denied']).toContain(status);
   }
 
   async verifyLoanErrorMessage(expectedMessage: string) {
-    const errorTexts = await this.profileUpdatePage.loanErrorMessage.allTextContents();
-    const normalizedExpected = expectedMessage.trim().toLowerCase();
-    const matchingText = errorTexts.find(text => text.trim().toLowerCase().includes(normalizedExpected));
-    expect(matchingText).toBeTruthy();
+    const errors = await this.profileUpdatePage.loanErrorMessage.allTextContents();
+
+    const normalized = expectedMessage.trim().toLowerCase();
+
+    const match = errors.find(e =>
+      e.trim().toLowerCase().includes(normalized)
+    );
+
+    expect(match).toBeTruthy();
   }
 }

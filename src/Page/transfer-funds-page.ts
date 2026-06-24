@@ -2,7 +2,6 @@ import { Page, Locator } from '@playwright/test';
 
 export class TransferFundsPage {
   readonly page: Page;
-
   readonly transferFundsLink: Locator;
   readonly amountInput: Locator;
   readonly fromAccountDropdown: Locator;
@@ -16,15 +15,16 @@ export class TransferFundsPage {
 
   constructor(page: Page) {
     this.page = page;
+
     this.transferFundsLink = page.getByRole('link', { name: 'Transfer Funds' });
-    this.amountInput = page.locator('#amount');
-    this.fromAccountDropdown = page.locator('#fromAccountId');
-    this.toAccountDropdown = page.locator('#toAccountId');
-    this.transferButton = page.locator('input[value="Transfer"]');
-    this.transferCompleteMessage = page.locator('#showResult h1.title');
-    this.transferAmountDisplay = page.locator('#amountResult');
-    this.fromAccountDisplay = page.locator('#fromAccountIdResult');
-    this.toAccountDisplay = page.locator('#toAccountIdResult');
-    this.errorMessage = page.locator('.error');
+    this.amountInput = page.locator('//input[@id="amount"]');
+    this.fromAccountDropdown = page.locator('//select[@id="fromAccountId"]');
+    this.toAccountDropdown = page.locator('//select[@id="toAccountId"]');
+    this.transferButton = page.locator('//input[@value="Transfer"]');
+    this.transferCompleteMessage = page.locator('//div[@id="showResult"]//h1');
+    this.transferAmountDisplay = page.locator('//span[@id="amountResult"]');
+    this.fromAccountDisplay = page.locator('//span[@id="fromAccountIdResult"]');
+    this.toAccountDisplay = page.locator('//span[@id="toAccountIdResult"]');
+    this.errorMessage = page.locator('//p[contains(@class,"error")]');
   }
 }

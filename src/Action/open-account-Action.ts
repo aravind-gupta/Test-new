@@ -1,72 +1,73 @@
 import { Page, expect } from '@playwright/test';
 import { OpenAccountPage } from '../Page/open-account-page';
- 
+
 export class OpenAccountAction {
   readonly page: Page;
   readonly openAccountPage: OpenAccountPage;
- 
+
   constructor(page: Page) {
     this.page = page;
     this.openAccountPage = new OpenAccountPage(page);
   }
- 
+
   async goToOpenNewAccount() {
     await this.openAccountPage.openNewAccountLink.click();
   }
- 
+
   async selectAccountType(type: 'SAVINGS' | 'CHECKING') {
     await this.openAccountPage.accountTypeDropdown.selectOption(type);
   }
- 
+
   async selectFromAccount(accountId?: string) {
     if (accountId) {
-      const optionExists = await this.openAccountPage.fromAccountDropdown
-        .locator(`option[value="${accountId}"]`)
-        .count();
- 
-      if (optionExists === 0) {
-        throw new Error(`Account ID "${accountId}" not found in fromAccountDropdown.`);
-      }
- 
       await this.openAccountPage.fromAccountDropdown.selectOption(accountId);
     }
   }
- 
-async createNewSavingsAccount(fromAccountId?: string) {
-  await this.goToOpenNewAccount();
 
-  await this.selectAccountType('SAVINGS');
-
-  await this.page.waitForTimeout(1000);
-
-  await this.selectFromAccount(fromAccountId);
-
-  // ❗ missing step
-  await this.submitOpenAccount();
-}
- 
   async submitOpenAccount() {
-  await this.openAccountPage.openAccountButton.click();
-}
- 
+    await this.openAccountPage.openAccountButton.click();
+  }
+
+  async createNewSavingsAccount(fromAccountId?: string) {
+    await this.goToOpenNewAccount();
+    await expect(this.openAccountPage.accountTypeDropdown).toBeVisible();
+
+    await this.selectAccountType('SAVINGS');
+    await this.selectFromAccount(fromAccountId);
+
+    await this.submitOpenAccount();
+  }
+
   async verifyAccountCreationSuccess() {
-    await expect(this.openAccountPage.successMessage).toHaveText('Account Opened!');
+    await expect(this.openAccountPage.successMessage)
+      .toHaveText('Account Opened!');
   }
- 
-  async getNewAccountNumber(): Promise<string> {
-    const locator = this.openAccountPage.newAccountIdLink;
- 
-    await expect(locator).toBeVisible({ timeout: 30000 });
- 
-    return (await locator.innerText()).trim();
-  }
- 
+
   async goToAccountsOverview() {
     await this.openAccountPage.accountsOverviewLink.click();
   }
- 
+
+  async waitForAccountsTable(timeout = 10000) {
+    await this.page.waitForSelector('//table[@id="accountTable"]', { timeout });
+  }
+
+  async getNewAccountNumber(): Promise<string> {
+    await this.goToAccountsOverview();
+    await this.waitForAccountsTable();
+
+    return (await this.openAccountPage.firstAccountLink.innerText()).trim();
+  }
+
+  async isAccountVisible(accountNumber: string): Promise<boolean> {
+    const loc = this.page.getByRole('link', { name: accountNumber });
+    const count = await loc.count();
+    if (count === 0) return false;
+
+    return await loc.first().isVisible();
+  }
+
   async verifyAccountNumberDisplayed(accountNumber: string) {
-    const accountLink = this.page.getByRole('link', { name: accountNumber });
-    await expect(accountLink).toBeVisible();
+    const visible = await this.isAccountVisible(accountNumber);
+    expect(visible).toBeTruthy();
   }
 }
